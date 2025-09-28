@@ -39,3 +39,20 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# build & deps
+node_modules/
+.next/
+dist/
+
+# env/config
+.env
+.env.*
+.vercel/
+*.log
+
+# OS/editor/IDE junk
+.vscode/
+.vs/
+.DS_Store
+Thumbs.db

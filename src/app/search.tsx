@@ -7,31 +7,77 @@ import Link from "next/link";
 
 export default function Search({ data }: { data: GovtForm[] }) {
   const [q, setQ] = useState("");
+  const [jurisdiction, setJurisdiction] = useState<string>("all");
+  const [category, setCategory] = useState<string>("all");
 
-  const fuse = useMemo(() => new Fuse(data, {
-    keys: ["code", "title", "aliases", "categories", "agency", "jurisdiction"],
-    threshold: 0.35,
-    ignoreLocation: true
-  }), [data]);
+  const fuse = useMemo(
+    () =>
+      new Fuse(data, {
+        keys: ["code", "title", "aliases", "categories", "agency", "jurisdiction"],
+        threshold: 0.35,
+        ignoreLocation: true,
+      }),
+    [data]
+  );
 
-  const results = q.trim()
-    ? fuse.search(q).slice(0, 25).map(r => r.item)
-    : [];
+  const jurisdictions = useMemo(
+    () => Array.from(new Set(data.map((f) => f.jurisdiction))).sort(),
+    [data]
+  );
+
+  const categories = useMemo(
+    () => Array.from(new Set(data.flatMap((f) => f.categories))).sort(),
+    [data]
+  );
+
+  const searched = q.trim() ? fuse.search(q).map((r) => r.item) : data;
+  const filtered = searched.filter((f) => {
+    const okJ = jurisdiction === "all" || f.jurisdiction === jurisdiction;
+    const okC = category === "all" || f.categories.includes(category);
+    return okJ && okC;
+  });
 
   return (
-    <div>
-      <input
-        value={q}
-        onChange={e => setQ(e.target.value)}
-        placeholder='Try: "W-9", "passport application", "tax id"'
-        style={{
-          width: "100%", padding: "12px 14px", fontSize: 16,
-          border: "1px solid #ccc", borderRadius: 8
-        }}
-      />
-      <div style={{marginTop: 16}}>
-        {q && results.length === 0 && <p>No results yet. Try “w9”, “passport” or an agency name.</p>}
-        {results.map(f => <ResultCard key={f.id} f={f} />)}
+    <div className="space-y-3">
+      <div className="flex flex-col md:flex-row gap-2">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder='Try: "W-9", "passport application", "tax id"'
+          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base"
+        />
+        <select
+          value={jurisdiction}
+          onChange={(e) => setJurisdiction(e.target.value)}
+          className="rounded-lg border border-slate-300 px-3 py-2"
+          aria-label="Filter by country"
+        >
+          <option value="all">All countries</option>
+          {jurisdictions.map((j) => (
+            <option key={j} value={j}>{j}</option>
+          ))}
+        </select>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="rounded-lg border border-slate-300 px-3 py-2"
+          aria-label="Filter by category"
+        >
+          <option value="all">All categories</option>
+          {categories.map((c) => (
+            <option key={c} value={c}>{c}</option>
+          ))}
+        </select>
+      </div>
+
+      {q && filtered.length === 0 && (
+        <p className="text-sm text-slate-600">No results. Try “w9”, “passport”, or an agency name.</p>
+      )}
+
+      <div className="space-y-3">
+        {filtered.slice(0, 50).map((f) => (
+          <ResultCard key={f.id} f={f} />
+        ))}
       </div>
     </div>
   );
@@ -40,26 +86,51 @@ export default function Search({ data }: { data: GovtForm[] }) {
 function ResultCard({ f }: { f: GovtForm }) {
   const verified = new Date(f.updated_at).toLocaleDateString();
   return (
-    <div style={{
-      border: "1px solid #e5e7eb", borderRadius: 8, padding: 16, marginBottom: 12
-    }}>
-      <div style={{display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap"}}>
-        <div>
-          <div style={{fontWeight: 600}}>[{f.code}] {f.title}</div>
-          <div style={{fontSize: 13, opacity: .85}}>
+    <div className="rounded-lg border border-slate-200 p-4">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="font-semibold truncate">[{f.code}] {f.title}</div>
+          <div className="text-xs text-slate-600">
             {f.agency} — {f.jurisdiction} • Updated: {verified}
           </div>
+          <div className="mt-2 flex flex-wrap gap-1">
+            {f.categories.map((c) => (
+              <span key={c} className="text-xs bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">
+                {c}
+              </span>
+            ))}
+          </div>
         </div>
-        <div style={{display: "flex", gap: 8, flexWrap: "wrap"}}>
-          {f.pdf_url && <a href={f.pdf_url} target="_blank" rel="noreferrer" className="btn">Download PDF</a>}
-          {f.instructions_url && <a href={f.instructions_url} target="_blank" rel="noreferrer" className="btn">Instructions</a>}
-          <a href={f.official_url} target="_blank" rel="noreferrer" className="btn">Official page</a>
-          <Link href={`/forms/${slugFor(f)}`} className="btn">Details</Link>
+        <div className="flex flex-wrap gap-2">
+          {f.pdf_url && (
+            <a href={f.pdf_url} target="_blank" rel="noreferrer" className="btn">
+              Download PDF
+            </a>
+          )}
+          {f.instructions_url && (
+            <a href={f.instructions_url} target="_blank" rel="noreferrer" className="btn">
+              Instructions
+            </a>
+          )}
+          <a href={f.official_url} target="_blank" rel="noreferrer" className="btn">
+            Official page
+          </a>
+          <Link href={`/forms/${slugFor(f)}`} className="btn">
+            Details
+          </Link>
         </div>
       </div>
       <style jsx>{`
-        .btn { border:1px solid #cbd5e1; padding:8px 10px; border-radius:8px; text-decoration:none; font-size:14px }
-        .btn:hover { background:#f8fafc }
+        .btn {
+          border: 1px solid #cbd5e1;
+          padding: 8px 10px;
+          border-radius: 8px;
+          text-decoration: none;
+          font-size: 14px;
+        }
+        .btn:hover {
+          background: #f8fafc;
+        }
       `}</style>
     </div>
   );
