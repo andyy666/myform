@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function Search({ data }: { data: GovtForm[] }) {
   const [q, setQ] = useState("");
-  const [jurisdiction, setJurisdiction] = useState<string>("all");
+  const [jurisdiction, setJurisdiction] = useState<string>("US");
   const [category, setCategory] = useState<string>("all");
 
   const fuse = useMemo(
@@ -20,11 +20,11 @@ export default function Search({ data }: { data: GovtForm[] }) {
     [data]
   );
 
+  // compute filters from current US-only data, but keep generic code
   const jurisdictions = useMemo(
     () => Array.from(new Set(data.map((f) => f.jurisdiction))).sort(),
     [data]
   );
-
   const categories = useMemo(
     () => Array.from(new Set(data.flatMap((f) => f.categories))).sort(),
     [data]
@@ -39,40 +39,44 @@ export default function Search({ data }: { data: GovtForm[] }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex flex-col md:flex-row gap-2">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder='Try: "W-9", "passport application", "tax id"'
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-base"
-        />
-        <select
-          value={jurisdiction}
-          onChange={(e) => setJurisdiction(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2"
-          aria-label="Filter by country"
-        >
-          <option value="all">All countries</option>
-          {jurisdictions.map((j) => (
-            <option key={j} value={j}>{j}</option>
-          ))}
-        </select>
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="rounded-lg border border-slate-300 px-3 py-2"
-          aria-label="Filter by category"
-        >
-          <option value="all">All categories</option>
-          {categories.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
+      <div className="card">
+        <div className="flex flex-col md:flex-row gap-2">
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder='Try: "W-9", "passport application", "tax id"'
+            className="input"
+            aria-label="Search forms"
+          />
+          <select
+            value={jurisdiction}
+            onChange={(e) => setJurisdiction(e.target.value)}
+            className="select"
+            aria-label="Filter by country"
+          >
+            <option value="all">All countries</option>
+            {jurisdictions.map((j) => (
+              <option key={j} value={j}>{j}</option>
+            ))}
+          </select>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="select"
+            aria-label="Filter by category"
+          >
+            <option value="all">All categories</option>
+            {categories.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
+        {q && filtered.length === 0 && (
+          <p className="text-sm text-slate-600 mt-2">
+            No results. Try “w9”, “passport”, or an agency name.
+          </p>
+        )}
       </div>
-
-      {q && filtered.length === 0 && (
-        <p className="text-sm text-slate-600">No results. Try “w9”, “passport”, or an agency name.</p>
-      )}
 
       <div className="space-y-3">
         {filtered.slice(0, 50).map((f) => (
@@ -86,7 +90,7 @@ export default function Search({ data }: { data: GovtForm[] }) {
 function ResultCard({ f }: { f: GovtForm }) {
   const verified = new Date(f.updated_at).toLocaleDateString();
   return (
-    <div className="rounded-lg border border-slate-200 p-4">
+    <div className="card">
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="font-semibold truncate">[{f.code}] {f.title}</div>
@@ -95,9 +99,7 @@ function ResultCard({ f }: { f: GovtForm }) {
           </div>
           <div className="mt-2 flex flex-wrap gap-1">
             {f.categories.map((c) => (
-              <span key={c} className="text-xs bg-slate-100 border border-slate-200 px-2 py-0.5 rounded-full">
-                {c}
-              </span>
+              <span key={c} className="chip">{c}</span>
             ))}
           </div>
         </div>
@@ -115,23 +117,11 @@ function ResultCard({ f }: { f: GovtForm }) {
           <a href={f.official_url} target="_blank" rel="noreferrer" className="btn">
             Official page
           </a>
-          <Link href={`/forms/${slugFor(f)}`} className="btn">
+          <Link href={`/forms/${slugFor(f)}`} className="btn btn-primary">
             Details
           </Link>
         </div>
       </div>
-      <style jsx>{`
-        .btn {
-          border: 1px solid #cbd5e1;
-          padding: 8px 10px;
-          border-radius: 8px;
-          text-decoration: none;
-          font-size: 14px;
-        }
-        .btn:hover {
-          background: #f8fafc;
-        }
-      `}</style>
     </div>
   );
 }

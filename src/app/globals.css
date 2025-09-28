@@ -24,3 +24,41 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+/* ---------- App theme helpers (Tailwind @apply) ---------- */
+@layer base {
+  :root {
+    --bg: 247 247 248;         /* soft gray background */
+    --card: 255 255 255;       /* white cards */
+    --text: 17 24 39;          /* slate-900 */
+    --muted: 100 116 139;      /* slate-500/600 */
+    --ring: 59 130 246;        /* blue-500 */
+    --primary: 37 99 235;      /* blue-600 */
+    --primary-700: 29 78 216;  /* blue-700 */
+  }
+  body { @apply bg-[rgb(var(--bg))] text-[rgb(var(--text))]; }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium
+           shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--ring))] focus:ring-offset-2;
+  }
+  .btn-primary {
+    @apply border-transparent bg-[rgb(var(--primary))] text-white hover:bg-[rgb(var(--primary-700))]
+           focus:ring-[rgb(var(--ring))];
+  }
+  .chip {
+    @apply inline-block rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700 border border-slate-200;
+  }
+  .card {
+    @apply rounded-xl border border-slate-200 bg-[rgb(var(--card))] p-4 shadow-sm;
+  }
+  .input {
+    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-base shadow-sm
+           focus:outline-none focus:ring-2 focus:ring-[rgb(var(--ring))] focus:ring-offset-1;
+  }
+  .select {
+    @apply rounded-lg border border-slate-300 bg-white px-3 py-2 shadow-sm
+           focus:outline-none focus:ring-2 focus:ring-[rgb(var(--ring))] focus:ring-offset-1;
+  }
+}

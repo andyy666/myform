@@ -95,53 +95,5 @@
     "updated_at": "2025-09-10",
     "status": "active",
     "aliases": ["ssa 89", "ssn verification"]
-  },
-  {
-    "id": "il-bl-6101",
-    "jurisdiction": "IL",
-    "level": "national",
-    "agency": "Bituach Leumi",
-    "code": "BL/6101",
-    "title": "Employer Registration (Israel)",
-    "categories": ["employment", "business"],
-    "official_url": "https://www.btl.gov.il/English",
-    "pdf_url": null,
-    "instructions_url": "https://www.btl.gov.il/Ergasim/Employers/Pages/Registration.aspx",
-    "submission": { "method": "online" },
-    "updated_at": "2025-09-10",
-    "status": "active",
-    "aliases": ["6101", "employer registration israel", "bituach leumi employer"]
-  },
-  {
-    "id": "il-misrad-hapnim-passport",
-    "jurisdiction": "IL",
-    "level": "national",
-    "agency": "Misrad HaPnim (Population and Immigration Authority)",
-    "code": "Passport",
-    "title": "Apply/Renew Israeli Passport",
-    "categories": ["passport", "identity", "travel"],
-    "official_url": "https://www.gov.il/en/departments/general/apply_for_a_biometric_passport",
-    "pdf_url": null,
-    "instructions_url": "https://www.gov.il/en/departments/general/apply_for_a_biometric_passport",
-    "submission": { "method": "in-person", "fee": "varies" },
-    "updated_at": "2025-09-10",
-    "status": "active",
-    "aliases": ["teudat maavar", "passport renewal israel", "biometric passport"]
-  },
-  {
-    "id": "il-tax-106",
-    "jurisdiction": "IL",
-    "level": "national",
-    "agency": "Mas Hachnasa (Israel Tax Authority)",
-    "code": "106",
-    "title": "Annual Wage Statement (Guidance & Form Access)",
-    "categories": ["tax", "employment"],
-    "official_url": "https://taxinfo.taxes.gov.il",
-    "pdf_url": null,
-    "instructions_url": "https://www.gov.il/he/departments/publications/doch-106",
-    "submission": { "method": "give-to-requester" },
-    "updated_at": "2025-09-10",
-    "status": "active",
-    "aliases": ["doch 106", "form 106 israel", "annual salary statement"]
   }
 ]
